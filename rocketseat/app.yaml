@@ -1,0 +1,11 @@
+application: rocketseat
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /core/static
+  static_dir: core/static
+
+- url: /.*
+  script: core/app.py
