@@ -15,9 +15,10 @@ class PageInstanceData(object):
         '''
         '''
         if uri_arguments is None:
-            self.uri_arguments = uri_arguments
+            self.uri_arguments = None
         else:
             self.uri_arguments = uri_arguments.split('/')
+        
         
         self.request_method = request_method
         if request_method == 'post':
