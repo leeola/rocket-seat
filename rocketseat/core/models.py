@@ -38,39 +38,27 @@ class CoreHooks(Hooks):
     core__plugin_enabled_hook = db.StringListProperty()
     core__plugin_disabled_hook = db.StringListProperty()
 
-class SiteModel(db.Model):
-    '''A DO containing information about the site itself, sitename, plugins,
-    etc.'''
+class RocketSeatConfig(db.Model):
+    '''A model containing configuration information about the site itself; 
+    such as, sitename, plugins, etc.'''
 
-    '''The level at which RS will cache. Note that each level only caches
-    if possible. The following describes each integer level.
-    0. No Caching
-    1. Block Caching
-    2. Region Caching
-    3. Full Page Caching
-    '''
-    caching_level = db.IntegerProperty(default=0)
-
-    #: A list of enabled plugins
+    # A list of enabled plugins in the form of the module path
     enabled_plugins = db.StringListProperty()
 
-    #: A list of required permissions.
-    required_permissions = db.StringListProperty(default=['sadmin'])
-
-    #: The active theme python path.
+    # The active theme python path.
     active_theme = db.StringProperty(default='core.themes.raw')
     
-    #: The site's maintenance value.
-    maintenance = db.BooleanProperty(default=True)
+    # Is the site undergoing maintenance?
+    undergoing_maintenance = db.BooleanProperty(default=True)
 
 class UserAccount(db.Model):
-    '''An entity that holds a single user's rocketseat account data.
-  '''
+    '''A model that holds a single user's rocketseat account data.
+    '''
 
-    #: The name alias for this user.
+    # The name alias for this user.
     alias = db.StringProperty(required=True)
 
-    #: A reference to this user's google account.
+    # A reference to this user's google account.
     gaccount = db.UserProperty(required=True)
 
     #permissions = db.StringListProperty(required=True)

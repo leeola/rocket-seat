@@ -6,29 +6,31 @@ import logging
 # related
 import google.appengine.ext.webapp
 # local
-import core.instance_data
+import core.request_bootstraps
 
 
 class PageHandler(google.appengine.ext.\
                   webapp.RequestHandler):
     ''''''
 
-
     def get(self, uri_arguments=None):
-        # Create Instance Data
-        page_data = core.instance_data.PageInstanceData(
+        
+        page_bootstrap = core.request_bootstraps.PageRequestBootstrap(
             self, 'get', uri_arguments)
-
         try:
-            maintenance = page_data.rocketseat_models['site'].maintenance
+            # Create Bootstrap Data
+            pass
         except:
+            # Todo: Explicitly except on the error that happens if a db 
+            # request is failed.
+            
             # Rocket Seat is not installed, show install information by
             # creating the instance handler, and passing off this request to it
             install_handler = InstallHandler()
             install_handler.get(uri_arguments)
         else:
-            if not maintenance:
-                # Rocket Seat is not set to maintenance mode, continue normally.
+            if not page_bootstrap.undergoing_maintenance:
+                # Rocket Seat is not undergoing maintenance, continue normally.
                 pass
             else:
                 # Rocket Seat is down for maintenance, display maintenance page.
@@ -41,14 +43,13 @@ class InstallHandler(google.appengine.ext.\
                      webapp.RequestHandler):
     ''''''
 
-
     def get(self, uri_arguments=None):
-        # Create Instance Data
-        page_data = core.instance_data.PageInstanceData(
+        # Create Bootstrap, compatible with no RS installation.
+        bootstrap = core.request_bootstraps.RequestBootstrap(
             self, 'get', uri_arguments)
         
         if uri_arguments is not None and \
-           page_data.uri_arguments[0].lower() == 'install':
+           bootstrap.uri_arguments[0].lower() == 'install':
             pass
         else:
             pass
@@ -59,7 +60,6 @@ class InstallHandler(google.appengine.ext.\
 class UnhandledHandler(google.appengine.ext.\
                        webapp.RequestHandler):
     '''Isn't this an oxymoron?'''
-
 
     def get(self, uri_arguments=None):
         pass
