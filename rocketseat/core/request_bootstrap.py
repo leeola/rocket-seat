@@ -5,8 +5,9 @@ that is used on every page load, by nearly all plugins.'''
 from exceptions import TypeError
 # related
 # local
-import core.model
 import core.error
+import core.model
+import core.plugin
 
 class RequestBootstrap(object):
     '''The base request bootstrap. No installation is needed at this level.'''
@@ -66,9 +67,10 @@ class InstalledRequestBootstrap(RequestBootstrap):
         
         # Fake values, removeme
         self.undergoing_maintenance = False
-        self.enabled_plugins = (
+        self.enabled_plugin_paths = (
             'core.plugin.block_spammer',
         )
+        self.plugin_manager = core.plugin.PluginManager(bootstrap=self)
         
 
 class PageRequestBootstrap(InstalledRequestBootstrap):
@@ -88,4 +90,3 @@ class PageRequestBootstrap(InstalledRequestBootstrap):
         # Fake a value, removeme
         self.active_theme = 'core.themes.raw'
         
-
