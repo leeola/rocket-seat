@@ -2,12 +2,11 @@
 that is used on every page load, by nearly all plugins.'''
 
 # standard
-import logging
-import exceptions
+from exceptions import TypeError
 # related
 # local
-import core.models
-import core.errors
+import core.model
+import core.error
 
 class RequestBootstrap(object):
     '''The base request bootstrap. No installation is needed at this level.'''
@@ -31,6 +30,19 @@ class RequestBootstrap(object):
         
         self.request_handler = request_handler
 
+class NotInstalledRequestBootstrap(RequestBootstrap):
+    '''The bootstrap with generic config data required to run the installation.
+    '''
+    
+    def __init__(self, request_handler, request_method, uri_arguments):
+        '''
+        '''
+        super(NotInstalledRequestBootstrap, self).__init__(
+            request_handler, request_method, uri_arguments)
+        
+        # Fake a value, removeme
+        self.active_theme = 'core.themes.raw'
+
 class InstalledRequestBootstrap(RequestBootstrap):
     '''The bootstrap with generic config data. This requires an installation.
     '''
@@ -41,19 +53,22 @@ class InstalledRequestBootstrap(RequestBootstrap):
         super(InstalledRequestBootstrap, self).__init__(
             request_handler, request_method, uri_arguments)
         
-        self._rs_config_ent = core.models.RocketSeatConfig.get_by_key_name(
+        self._rs_config_ent = core.model.RocketSeatConfig.get_by_key_name(
             'core_site')
-        self._core_hooks_ent = core.models.CoreHooks.get_by_key_name(
+        self._core_hooks_ent = core.model.CoreHooks.get_by_key_name(
             'core_hooks')
         
         ##try:
             ##self.undergoing_maintenance = self._rs_config_ent[
                 ##'core_site'].undergoing_maintenance
-        ##except exceptions.TypeError:
-            ##raise core.errors.NotInstalledError()
+        ##except TypeError:
+            ##raise core.error.NotInstalledError()
         
-        # Fake a value, removeme
+        # Fake values, removeme
         self.undergoing_maintenance = False
+        self.enabled_plugins = (
+            'core.plugin.block_spammer',
+        )
         
 
 class PageRequestBootstrap(InstalledRequestBootstrap):
@@ -67,8 +82,8 @@ class PageRequestBootstrap(InstalledRequestBootstrap):
         
         ##try:
             ##self.active_theme = self._rs_config_ent['core_site'].active_theme
-        ##except exceptions.TypeError:
-            ##raise core.errors.NotInstalledError()
+        ##except TypeError:
+            ##raise core.error.NotInstalledError()
         
         # Fake a value, removeme
         self.active_theme = 'core.themes.raw'

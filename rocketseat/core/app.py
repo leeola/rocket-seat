@@ -1,7 +1,6 @@
 ''''''
 
 # Standard
-import sys
 import logging
 # Related
 import wsgiref.handlers

@@ -1,12 +1,11 @@
 ''''''
 
 # standard
-import sys
-import logging
 # related
 import google.appengine.ext.webapp
 # local
-import core.request_bootstraps
+import core.error
+import core.request_bootstrap
 
 
 class PageHandler(google.appengine.ext.\
@@ -14,16 +13,11 @@ class PageHandler(google.appengine.ext.\
     ''''''
 
     def get(self, uri_arguments=None):
-        
-        page_bootstrap = core.request_bootstraps.PageRequestBootstrap(
-            self, 'get', uri_arguments)
         try:
             # Create Bootstrap Data
-            pass
-        except:
-            # Todo: Explicitly except on the error that happens if a db 
-            # request is failed.
-            
+            page_bootstrap = core.request_bootstrap.PageRequestBootstrap(
+                self, 'get', uri_arguments)
+        except core.error.NotInstalledError:
             # Rocket Seat is not installed, show install information by
             # creating the instance handler, and passing off this request to it
             install_handler = InstallHandler()
@@ -45,7 +39,7 @@ class InstallHandler(google.appengine.ext.\
 
     def get(self, uri_arguments=None):
         # Create Bootstrap, compatible with no RS installation.
-        bootstrap = core.request_bootstraps.RequestBootstrap(
+        bootstrap = core.request_bootstrap.RequestBootstrap(
             self, 'get', uri_arguments)
         
         if uri_arguments is not None and \
