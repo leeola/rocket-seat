@@ -68,7 +68,7 @@ class InstalledRequestBootstrap(RequestBootstrap):
         # Fake values, removeme
         self.undergoing_maintenance = False
         self.enabled_plugin_paths = (
-            'core.plugin.block_spammer',
+            'core.plugins.block_spammer',
         )
         self.plugin_manager = core.plugin.PluginManager(bootstrap=self)
         

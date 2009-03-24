@@ -6,10 +6,21 @@
 import core.plugin
 
 
-class PluginEvents(core.plugin.PluginEvents):
-    ''''''
-    pass
-
 class Plugin(core.plugin.Plugin):
     ''''''
-    pass
+    
+    
+    def __init__(self, bootstrap):
+        '''
+        '''
+        super(Plugin, self).__init__(bootstrap)
+        
+        self.events = PluginEvents(bootstrap)
+
+class PluginEvents(core.plugin.PluginEvents):
+    ''''''
+    
+    def core_p__bootstrap_finished(self, callback):
+        '''
+        '''
+        pass

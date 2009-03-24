@@ -6,28 +6,28 @@ import logging
 import wsgiref.handlers
 import google.appengine.ext.webapp
 # Local
-import core.handlers
+import core.handler
 
 
 def execute_app():
     application = google.appengine.ext.webapp.WSGIApplication(
         [
             # Grab the page with no arguments.
-            (r'/', core.handlers.PageHandler),
+            (r'/', core.handler.PageHandler),
             # Grab the page with any arguments given.
-            (r'/(.+)', core.handlers.PageHandler),
+            (r'/(.+)', core.handler.PageHandler),
             
-            (r'/install', core.handlers.InstallHandler),
-            (r'/install(.+)', core.handlers.InstallHandler),
+            (r'/install', core.handler.InstallHandler),
+            (r'/install(.+)', core.handler.InstallHandler),
             
-            (r'/update', core.handlers.UnhandledHandler),
-            (r'/update(.+)', core.handlers.UnhandledHandler),
+            (r'/update', core.handler.UnhandledHandler),
+            (r'/update(.+)', core.handler.UnhandledHandler),
             
-            (r'/json', core.handlers.UnhandledHandler),
-            (r'/json(.+)', core.handlers.UnhandledHandler),
+            (r'/json', core.handler.UnhandledHandler),
+            (r'/json(.+)', core.handler.UnhandledHandler),
             
-            (r'/feed', core.handlers.UnhandledHandler),
-            (r'/feed(.+)', core.handlers.UnhandledHandler),
+            (r'/feed', core.handler.UnhandledHandler),
+            (r'/feed(.+)', core.handler.UnhandledHandler),
             ],
         debug=True
         )
