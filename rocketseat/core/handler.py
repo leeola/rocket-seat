@@ -3,6 +3,7 @@
 # standard
 # related
 import google.appengine.ext.webapp
+from google.appengine.api import memcache
 # local
 import core.error
 import core.request_bootstrap
@@ -15,8 +16,13 @@ class PageHandler(google.appengine.ext.\
     def get(self, uri_arguments=None):
         try:
             # Create Bootstrap Data
-            page_bootstrap = core.request_bootstrap.PageRequestBootstrap(
-                self, 'get', uri_arguments)
+            page_bootstrap = memcache.get('page_bootstrap')
+            if page_bootstrap is None:
+                print 'Creating Cache'
+                page_bootstrap = core.request_bootstrap.PageRequestBootstrap(
+                    self, 'get', uri_arguments)
+                memcache.add('page_bootstrap', page_bootstrap,)
+            
         except core.error.NotInstalledError:
             # Rocket Seat is not installed, show install information by
             # creating the instance handler, and passing off this request to it

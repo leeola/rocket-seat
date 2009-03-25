@@ -29,7 +29,7 @@ class RequestBootstrap(object):
         else:
             self.post_data = None
         
-        self.request_handler = request_handler
+        #self.request_handler = request_handler
 
 class NotInstalledRequestBootstrap(RequestBootstrap):
     '''The bootstrap with generic config data required to run the installation.
@@ -70,6 +70,7 @@ class InstalledRequestBootstrap(RequestBootstrap):
         self.enabled_plugin_paths = (
             'core.plugins.block_spammer',
         )
+        
         self.plugin_manager = core.plugin.PluginManager(bootstrap=self)
         
 
