@@ -29,6 +29,9 @@ class RequestBootstrap(object):
         else:
             self.post_data = None
         
+        # This is commented out due to it not having the ability to be cached
+        # in memcache. I am waiting to re-implement this until its usage
+        # can more accurately be determined.
         #self.request_handler = request_handler
 
 class NotInstalledRequestBootstrap(RequestBootstrap):

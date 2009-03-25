@@ -14,11 +14,13 @@ class PageHandler(google.appengine.ext.\
     ''''''
 
     def get(self, uri_arguments=None):
+        
+        # Grab the data from the cache
+        page_bootstrap = memcache.get('page_bootstrap')
+        
         try:
             # Create Bootstrap Data
-            page_bootstrap = memcache.get('page_bootstrap')
             if page_bootstrap is None:
-                print 'Creating Cache'
                 page_bootstrap = core.request_bootstrap.PageRequestBootstrap(
                     self, 'get', uri_arguments)
                 memcache.add('page_bootstrap', page_bootstrap,)

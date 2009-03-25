@@ -34,16 +34,18 @@ class PluginManager(object):
             plugin_module = __import__(plugin_path+'.plugin',
                                        fromlist=['a'])
             
-            # Return an instance of the plugin
-            return plugin_module.Plugin(bootstrap)    
+            # Return the plugin scriptname and an instance of the plugin
+            # as key value pairs.
+            plugin = plugin_module.Plugin(bootstrap)  
+            return (plugin.script_name, plugin)
         
-        self.enabled_plugins = map(import_and_init, enabled_plugin_paths)
+        self.enabled_plugins = dict(map(import_and_init, enabled_plugin_paths))
     
     def hook_plugins(self, owner, hook, callback=None, **kwargs):
         '''
         '''
         # Store it locally for efficiency
-        enabled_plugins = self.enabled_plugins
+        enabled_plugins = self.enabled_plugins.values()
         
         # Include the owner of the hook, in the hook string.
         hook = owner+'__'+hook

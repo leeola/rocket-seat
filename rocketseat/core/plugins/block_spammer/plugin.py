@@ -9,6 +9,7 @@ import core.plugin
 class Plugin(core.plugin.Plugin):
     ''''''
     
+    script_name = 'block_spammer'
     
     def __init__(self, bootstrap):
         '''
