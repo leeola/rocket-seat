@@ -14,7 +14,8 @@ class PageHandler(google.appengine.ext.\
     ''''''
 
     def get(self, uri_arguments=None):
-        
+        '''
+        '''
         # Grab the data from the cache
         page_bootstrap = memcache.get('page_bootstrap')
         
@@ -23,7 +24,7 @@ class PageHandler(google.appengine.ext.\
             if page_bootstrap is None:
                 page_bootstrap = core.request_bootstrap.PageRequestBootstrap(
                     self, 'get', uri_arguments)
-                memcache.add('page_bootstrap', page_bootstrap,)
+                memcache.add('page_bootstrap', page_bootstrap, 60)
             
         except core.error.NotInstalledError:
             # Rocket Seat is not installed, show install information by
@@ -42,6 +43,8 @@ class PageHandler(google.appengine.ext.\
                 pass
 
     def post(self, uri_arguments=None):
+        '''
+        '''
         pass
 
 class InstallHandler(google.appengine.ext.\
@@ -49,6 +52,8 @@ class InstallHandler(google.appengine.ext.\
     ''''''
 
     def get(self, uri_arguments=None):
+        '''
+        '''
         # Create Bootstrap, compatible with no RS installation.
         bootstrap = core.request_bootstrap.RequestBootstrap(
             self, 'get', uri_arguments)
@@ -60,6 +65,8 @@ class InstallHandler(google.appengine.ext.\
             pass
 
     def post(self, uri_arguments=None):
+        '''
+        '''
         pass
 
 class UnhandledHandler(google.appengine.ext.\
@@ -67,7 +74,32 @@ class UnhandledHandler(google.appengine.ext.\
     '''Isn't this an oxymoron?'''
 
     def get(self, uri_arguments=None):
+        '''
+        '''
         pass
 
     def post(self, uri_arguments=None):
+        '''
+        '''
+        pass
+
+class DevUtils(google.appengine.ext.\
+                       webapp.RequestHandler):
+    '''This is a temporary solution to implement some simple dev actions, such
+    as removing the cache manually, etc.'''
+
+    def get(self, uri_arguments=None):
+        '''
+        '''
+        uri_arguments = uri_arguments.split('/')
+        
+        if uri_arguments is None:
+            return
+        
+        if uri_arguments[0] == 'empty_memcache':
+            memcache.delete('page_bootstrap')
+
+    def post(self, uri_arguments=None):
+        '''
+        '''
         pass

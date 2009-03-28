@@ -12,22 +12,25 @@ import core.handler
 def execute_app():
     application = google.appengine.ext.webapp.WSGIApplication(
         [
+            (r'/install', core.handler.InstallHandler),
+            (r'/install/(.+)', core.handler.InstallHandler),
+            
+            (r'/update', core.handler.UnhandledHandler),
+            (r'/update/(.+)', core.handler.UnhandledHandler),
+            
+            (r'/json', core.handler.UnhandledHandler),
+            (r'/json/(.+)', core.handler.UnhandledHandler),
+            
+            (r'/feed', core.handler.UnhandledHandler),
+            (r'/feed/(.+)', core.handler.UnhandledHandler),
+            
+            (r'/dev_utils', core.handler.DevUtils),
+            (r'/dev_utils/(.+)', core.handler.DevUtils),
+            
             # Grab the page with no arguments.
             (r'/', core.handler.PageHandler),
             # Grab the page with any arguments given.
             (r'/(.+)', core.handler.PageHandler),
-            
-            (r'/install', core.handler.InstallHandler),
-            (r'/install(.+)', core.handler.InstallHandler),
-            
-            (r'/update', core.handler.UnhandledHandler),
-            (r'/update(.+)', core.handler.UnhandledHandler),
-            
-            (r'/json', core.handler.UnhandledHandler),
-            (r'/json(.+)', core.handler.UnhandledHandler),
-            
-            (r'/feed', core.handler.UnhandledHandler),
-            (r'/feed(.+)', core.handler.UnhandledHandler),
             ],
         debug=True
         )
