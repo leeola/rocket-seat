@@ -16,12 +16,12 @@ class Plugin(core.plugin.Plugin):
         '''
         super(Plugin, self).__init__(bootstrap)
         
-        self.events = PluginEvents(bootstrap)
+        self.events = PluginHooks(bootstrap)
 
-class PluginEvents(core.plugin.PluginEvents):
+class PluginHooks(core.plugin.PluginHooks):
     ''''''
     
-    def core_p__bootstrap_finished(self, callback):
+    def core_p__bootstrap_finished(self, callback=None):
         '''
         '''
         pass
