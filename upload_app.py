@@ -1,4 +1,7 @@
-'''
+'''The upload app is a basic wrapper for the standard SDK uploader. It provides
+a means to save settings (such as appname, and sdk path), and in the future
+will ensure the upload destination is ready to recieve a newer version of
+Rocket Seat. (Eg, assuring that pickled objects in memcache are removed, etc.)
 '''
 
 # Standard
