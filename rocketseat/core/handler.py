@@ -35,9 +35,12 @@ class PageHandler(google.appengine.ext.\
             if not page_bootstrap.undergoing_maintenance:
                 # Rocket Seat is not undergoing maintenance, continue normally.
                 
-                page_bootstrap.plugin_manager.hook_plugins(
-                    'core_p', 'bootstrap_finished'
-                )
+                # This is going to be replaced with the upcoming event 
+                # interface
+                #page_bootstrap.plugin_manager.hook_plugins(
+                    #'core_p', 'bootstrap_finished'
+                #)
+                pass
             else:
                 # Rocket Seat is down for maintenance, display maintenance page.
                 pass

@@ -42,14 +42,13 @@ def profile_app():
     
     import cProfile, pstats
     prof = cProfile.Profile()
-    prof = prof.runctx("execute_app()", globals(), locals())
-    print "<pre>"
+    prof = prof.runctx('execute_app()', globals(), locals())
+    print '<pre>'
     stats = pstats.Stats(prof)
-    #stats.sort_stats("time")
-    stats.sort_stats("cumulative")
+    stats.sort_stats('cumulative')
     stats.print_stats('rocketseat', 200)
-    print "</pre>"
+    print '</pre>'
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     profile_app()
 

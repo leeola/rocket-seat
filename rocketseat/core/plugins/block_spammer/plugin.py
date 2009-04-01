@@ -16,9 +16,9 @@ class Plugin(core.plugin.Plugin):
         '''
         super(Plugin, self).__init__(bootstrap)
         
-        self.events = PluginHooks(bootstrap)
+        self.listeners = PluginListeners(self, bootstrap)
 
-class PluginHooks(core.plugin.PluginHooks):
+class PluginListeners(core.plugin.PluginListeners):
     ''''''
     
     def core_p__bootstrap_finished(self, callback=None):

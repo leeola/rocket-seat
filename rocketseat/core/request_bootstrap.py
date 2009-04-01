@@ -59,8 +59,8 @@ class InstalledRequestBootstrap(RequestBootstrap):
         
         self._rs_config_ent = core.model.RocketSeatConfig.get_by_key_name(
             'core_site')
-        self._core_hooks_ent = core.model.CoreHooks.get_by_key_name(
-            'core_hooks')
+        self._core_events_ent = core.model.CoreEvents.get_by_key_name(
+            'core_events')
         
         ##try:
             ##self.undergoing_maintenance = self._rs_config_ent[
@@ -74,8 +74,8 @@ class InstalledRequestBootstrap(RequestBootstrap):
             'core.plugins.block_spammer',
         )
         
-        self.plugin_manager = core.plugin.PluginManager(bootstrap=self)
-        
+        self.plugins = core.plugin.initialize_plugins(
+            self)
 
 class PageRequestBootstrap(InstalledRequestBootstrap):
     '''The bootstrap from a page request.'''
