@@ -6,6 +6,7 @@ import google.appengine.ext.webapp
 from google.appengine.api import memcache
 # local
 import core.error
+import core.event
 import core.request_bootstrap
 
 
@@ -35,12 +36,14 @@ class PageHandler(google.appengine.ext.\
             if not page_bootstrap.undergoing_maintenance:
                 # Rocket Seat is not undergoing maintenance, continue normally.
                 
-                # This is going to be replaced with the upcoming event 
-                # interface
-                #page_bootstrap.plugin_manager.hook_plugins(
-                    #'core_p', 'bootstrap_finished'
-                #)
-                pass
+                # Create an events controller for the core. This will most
+                # likely be put elsewhere as this evolves, as with most of
+                # this page logic.
+                event_controller = core.event.EventsController(
+                    page_bootstrap._core_events_ent, page_bootstrap.plugins)
+                
+                # Trigger the Bootstrap Finished event.
+                event_controller.call_listeners('core_p', 'bootstrap_finished')
             else:
                 # Rocket Seat is down for maintenance, display maintenance page.
                 pass
