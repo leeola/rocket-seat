@@ -57,9 +57,9 @@ class InstalledRequestBootstrap(RequestBootstrap):
         super(InstalledRequestBootstrap, self).__init__(
             request_handler, request_method, uri_arguments)
         
-        self._rs_config_ent = core.model.RocketSeatConfig.get_by_key_name(
+        self.rs_config_ent = core.model.RocketSeatConfig.get_by_key_name(
             'core_site')
-        self._core_events_ent = core.model.CoreEvents.get_by_key_name(
+        self.core_events_ent = core.model.CoreEvents.get_by_key_name(
             'core_events')
         
         ##try:

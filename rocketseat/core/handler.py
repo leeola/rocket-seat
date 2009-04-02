@@ -40,10 +40,11 @@ class PageHandler(google.appengine.ext.\
                 # likely be put elsewhere as this evolves, as with most of
                 # this page logic.
                 event_controller = core.event.EventsController(
-                    page_bootstrap._core_events_ent, page_bootstrap.plugins)
+                    page_bootstrap.core_events_ent, page_bootstrap.plugins)
                 
                 # Trigger the Bootstrap Finished event.
                 event_controller.call_listeners('core_p', 'bootstrap_finished')
+                
             else:
                 # Rocket Seat is down for maintenance, display maintenance page.
                 pass
