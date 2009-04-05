@@ -1,2 +1,4 @@
 *.pyc
 .upload_app_cfg
+rocketseat/core/external_lib/*
+rocketseat/core/template_cache/*

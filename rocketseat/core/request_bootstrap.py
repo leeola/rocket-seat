@@ -45,7 +45,7 @@ class NotInstalledRequestBootstrap(RequestBootstrap):
             request_handler, request_method, uri_arguments)
         
         # Fake a value, removeme
-        self.active_theme = 'core.themes.raw'
+        self.active_theme = 'core.themes.usability'
 
 class InstalledRequestBootstrap(RequestBootstrap):
     '''The bootstrap with generic config data. This requires an installation.
@@ -92,5 +92,5 @@ class PageRequestBootstrap(InstalledRequestBootstrap):
             ##raise core.error.NotInstalledError()
         
         # Fake a value, removeme
-        self.active_theme = 'core.themes.raw'
+        self.active_theme = 'core.themes.usability'
         
