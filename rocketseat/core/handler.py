@@ -47,6 +47,8 @@ class PageHandler(google.appengine.ext.\
                 
                 # Trigger the Bootstrap Finished event.
                 event_controller.call_listeners('core_p', 'bootstrap_finished')
+                
+                #self.response.out.write(page_bootstrap.theme.render())
             else:
                 # Rocket Seat is down for maintenance, display maintenance page.
                 pass

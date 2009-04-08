@@ -4,6 +4,7 @@
 # Standard
 import os.path
 # Related
+import mako.template
 # Local
 import core.error
 
@@ -39,17 +40,27 @@ class Theme(object):
     def __init__(self, theme_script_name):
         '''
         '''
+        self.theme_script_name = theme_script_name
+        
         if os.path.exists('../user/themes/%s' % theme_script_name):
             self.user_theme = True
+            self.theme_abs_path = os.path.abspath(
+                '../user/themes/%s' % theme_script_name)
         elif os.path.exists('themes/%s' % theme_script_name):
             self.user_theme = False
+            self.theme_abs_path = os.path.abspath(
+                'themes/%s' % theme_script_name)
         else:
             raise core.error.ThemeNotFoundError(theme_script_name)
         
+        self.cache_abs_path = os.path.abspath(
+            'template_cache')
+        print self.cache_abs_path
     
-    def get_uri(self):
-        '''Return the uri of this theme.'''
-        if self.user_theme:
-            return '/user/themes/%s/' % self.script_name
-        else:
-            return '/core/themes/%s/' % self.script_name
+    def render(self):
+        '''
+        '''
+        mytemplate = mako.template.Template(
+            filename='%s/base.html' % self.theme_abs_path,
+            module_directory=self.cache_abs_path)
+        return mytemplate.render()
