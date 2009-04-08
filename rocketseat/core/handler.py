@@ -20,13 +20,15 @@ class PageHandler(google.appengine.ext.\
         '''
         # Grab the data from the cache
         page_bootstrap = memcache.get('page_bootstrap')
+        # This is here to disable caching for early testing of themes.
+        page_bootstrap = None
         
         try:
             # Create Bootstrap Data
             if page_bootstrap is None:
                 page_bootstrap = core.request_bootstrap.PageRequestBootstrap(
                     self, 'get', uri_arguments)
-                #memcache.add('page_bootstrap', page_bootstrap, 60)
+                memcache.add('page_bootstrap', page_bootstrap, 60)
             
         except core.error.NotInstalledError:
             # Rocket Seat is not installed, show install information by

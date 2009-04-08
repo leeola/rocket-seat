@@ -8,6 +8,7 @@ from exceptions import TypeError
 import core.error
 import core.model
 import core.plugin
+import core.theme
 
 class RequestBootstrap(object):
     '''The base request bootstrap. No installation is needed at this level.'''
@@ -92,5 +93,6 @@ class PageRequestBootstrap(InstalledRequestBootstrap):
             ##raise core.error.NotInstalledError()
         
         # Fake a value, removeme
-        self.active_theme = 'core.themes.usability'
+        self.theme_script_name = 'usability'
         
+        self.theme = core.theme.Theme(self.theme_script_name)

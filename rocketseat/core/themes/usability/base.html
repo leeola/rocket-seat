@@ -4,10 +4,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-    <title>{{page_title}} - {{site_name}}</title>
+    <title>${page_title} - ${site_name}</title>
     
-    {{site_css}}
-    {{site_js}}
+    ${site_js}
     
     <!-- Code will be added to aggregate the css and make less calls needed,
     adding the ability.-->
@@ -22,9 +21,11 @@
         type="text/css" media="screen, projection">
     <link rel="stylesheet" href="/themes/usability/css/layout.css"
         type="text/css" media="screen, projection">
+    
+    ${site_css}
+    
 </head>
 <body>
-    <div class="container grid">
-        
-    </div>
+    ${base_body}
 </body>
+</html>
