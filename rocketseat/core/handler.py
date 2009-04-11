@@ -24,11 +24,13 @@ class PageHandler(google.appengine.ext.\
         page_bootstrap = None
         
         try:
-            # Create Bootstrap Data
-            if page_bootstrap is None:
+            if page_bootstrap is not None:
+                # Call the bootstrap's startup..
+                page_bootstrap.startup()
+            else:
+                # Create Bootstrap Data
                 page_bootstrap = core.request_bootstrap.PageRequestBootstrap(
                     self, 'get', uri_arguments)
-                memcache.add('page_bootstrap', page_bootstrap, 60)
             
         except core.error.NotInstalledError:
             # Rocket Seat is not installed, show install information by
@@ -49,6 +51,10 @@ class PageHandler(google.appengine.ext.\
                 event_controller.call_listeners('core_p', 'bootstrap_finished')
                 
                 #self.response.out.write(page_bootstrap.theme.render())
+                
+                # Call shutdown, then add the bootstrap to memcache.
+                page_bootstrap.shutdown()
+                memcache.add('page_bootstrap', page_bootstrap, 60)
             else:
                 # Rocket Seat is down for maintenance, display maintenance page.
                 pass

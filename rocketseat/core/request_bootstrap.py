@@ -34,6 +34,22 @@ class RequestBootstrap(object):
         # in memcache. I am waiting to re-implement this until its usage
         # can more accurately be determined.
         #self.request_handler = request_handler
+    
+    def shutdown(self):
+        '''Close or Save any objects held within the bootstrap object that
+        cannot be stored (Pickled) inside of memcache.
+        
+        @see: startup
+        '''
+        pass
+    
+    def startup(self):
+        '''This is called when the bootstrap object is brought out of memcache.
+        This allows the bootstrap to take in, or create, and objects needed
+        but were not stored on the memcache. Eg: the ones which were
+        shut down.
+        '''
+        pass
 
 class NotInstalledRequestBootstrap(RequestBootstrap):
     '''The bootstrap with generic config data required to run the installation.
