@@ -8,11 +8,10 @@ Rocket Seat. (Eg, assuring that pickled objects in memcache are removed, etc.)
 import os
 import sys
 import optparse
-import re
 import cPickle
 # Related
 # Local
-import lib 
+import lib.upload
 
 class UploadAppCLIError(Exception):
     ''''''
