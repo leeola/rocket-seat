@@ -11,7 +11,7 @@ import logging
 
 
 def enable_debugger_catching():
-    '''To allow WingIDE to catch rocketseat exceptions, run this function
+    '''To allow WingIDE to catch rocketseat exceptions, run this function.
     '''
     
     logging.root.addHandler(WingIDEDebuggerExceptionHandler(

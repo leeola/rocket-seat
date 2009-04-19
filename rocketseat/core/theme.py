@@ -41,7 +41,7 @@ class Theme(object):
         '''
         '''
         self.theme_script_name = theme_script_name
-        
+
         if os.path.exists('../user/themes/%s' % theme_script_name):
             self.user_theme = True
             self.theme_abs_path = os.path.abspath(
@@ -52,15 +52,16 @@ class Theme(object):
                 'themes/%s' % theme_script_name)
         else:
             raise core.error.ThemeNotFoundError(theme_script_name)
-        
-        self.cache_abs_path = os.path.abspath(
-            'template_cache')
-        print self.cache_abs_path
-    
+
     def render(self):
         '''
         '''
-        mytemplate = mako.template.Template(
+        template = mako.template.Template(
             filename='%s/base.html' % self.theme_abs_path,
             module_directory=self.cache_abs_path)
-        return mytemplate.render()
+        pass
+
+    def add_block_content(self):
+        '''
+        '''
+        pass
