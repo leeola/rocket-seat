@@ -8,7 +8,7 @@ from google.appengine.api import memcache
 import core.error
 import core.event
 import core.request_bootstrap
-import user.themes
+import core.themes
 
 
 class PageHandler(google.appengine.ext.\
