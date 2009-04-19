@@ -4,6 +4,9 @@
 import logging
 import sys
 import os
+
+# Append the external libraries to the python path
+sys.path.append(os.path.abspath('external_lib'))
 # Related
 import wsgiref.handlers
 import google.appengine.ext.webapp
@@ -12,8 +15,6 @@ import core.handler
 
 
 def main():
-    # Append the external libraries to the python path
-    sys.path.append(os.path.abspath('external_lib'))
     live_server = os.environ['SERVER_SOFTWARE'].startswith('Google Apphosting/')
 
     def run_app():
