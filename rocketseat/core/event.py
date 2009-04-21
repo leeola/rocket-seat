@@ -23,8 +23,10 @@ class EventsController(object):
     
     def call_listeners(self, owner_name, event_name, callback=None, **kwargs):
         '''
-        Note: The caching of listener in this may not do anything useful. Tests
+        @note: The caching of listener in this may not do anything useful. Tests
         are needed to figure that out.
+        
+        @returns: A list of values returned from each listener called.
         '''
         # Store it locally for efficiency
         plugins = self.plugins.values()
@@ -58,10 +60,10 @@ class EventsController(object):
             # We are not checking if the listener is subscribed to the event.
             # It is assumed that if the listener was run once, and cached,
             # that it is subscribed already.
-            map(call_a_cached_listener, listener_cache[full_event_name])
+            return map(call_a_cached_listener, listener_cache[full_event_name])
         else:
             listener_cache[full_event_name] = []
-            map(call_a_listener, plugins)
+            return map(call_a_listener, plugins)
     
     def call_all_listeners(self, owner_name, event_name, 
                            callback=None, **kwargs):
@@ -71,6 +73,8 @@ class EventsController(object):
         Note: This is to only be used for a small set of events. These events
         are also required, because this function does not try/except any
         plugins that may not have the listener function defined.
+        
+        @returns: A list of values returned from each listener called.
         '''
         # Store it locally for efficiency
         plugins = self.plugins.values()
@@ -82,7 +86,7 @@ class EventsController(object):
             return getattr(plugin.listeners, 
                            full_event_name)(callback, **kwargs)
         
-        map(call_a_listener, plugins)
+        return map(call_a_listener, plugins)
     
     def clear_cache(self):
         '''
