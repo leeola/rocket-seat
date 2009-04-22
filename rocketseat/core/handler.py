@@ -50,7 +50,7 @@ class PageHandler(google.appengine.ext.\
                 # Trigger the Bootstrap Finished event.
                 event_controller.call_listeners('core_p', 'bootstrap_finished')
                 
-                #self.response.out.write(page_bootstrap.theme.render())
+                self.response.out.write(page_bootstrap.theme.render())
                 
                 # Call shutdown, then add the bootstrap to memcache.
                 page_bootstrap.shutdown()

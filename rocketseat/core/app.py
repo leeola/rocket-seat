@@ -11,10 +11,11 @@ sys.path.append(os.path.abspath('external_lib'))
 import wsgiref.handlers
 import google.appengine.ext.webapp
 # Local
-import core.handler
 
 
 def main():
+    import core.handler
+    
     live_server = os.environ['SERVER_SOFTWARE'].startswith('Google Apphosting/')
 
     def run_app():
@@ -45,7 +46,16 @@ def main():
         wsgiref.handlers.CGIHandler().run(application)
 
     if live_server:
-        run_app(False)
+        #run_app()
+        
+        import cProfile, pstats
+        prof = cProfile.Profile()
+        prof = prof.runctx('run_app()', globals(), locals())
+        print '<pre>'
+        stats = pstats.Stats(prof)
+        stats.sort_stats('cumulative')
+        stats.print_stats('rocketseat', 200)
+        print '</pre>'
     else:
         logger = logging.getLogger()
         logger.setLevel(logging.DEBUG)

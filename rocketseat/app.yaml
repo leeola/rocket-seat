@@ -8,6 +8,10 @@ handlers:
   static_files: core/themes/\1/static/\2
   upload: core/themes/(.+?)/static/(.*)
   
+- url: /static/themes/user/(.+?)/(.*)
+  static_files: user/themes/\1/static/\2
+  upload: user/themes/(.+?)/static/(.*)
+  
 - url: /static/(.*)
   static_files: core/static/\1
   upload: core/static/(.*)

@@ -3,23 +3,28 @@
 # Standard
 # Related
 # Local
+from core.theme import CSSFile, JSFile
 
-css_files = (
-    # This takes tuples defined for options, in the order of:
-    # 0: css filename
-    # 1: media type (leave empty string if default)
-    # 2: IE Only
-    
-    ('blueprint/screen.css',),
-    ('blueprint/print.css', 'print'),
-    ('blueprint/ie.css', '', True),
-    ('layout.css',),
-    ('style.css',),
+js_files = (
 )
 
-humane_name = None
+css_files = (
+    CSSFile('css/blueprint/screen.css'),
+    CSSFile('css/blueprint/print.css', media='print'),
+    CSSFile('css/blueprint/ie.css', ie_only=True),
+    CSSFile('css/layout.css'),
+    CSSFile('css/style.css'),
+)
+
+humane_name = 'Usability'
+
+theme_graphic = None
 
 regions = (
+    'content',
+    'menu',
+    'navigation',
+    'footer'
 )
 
 page_templates = (

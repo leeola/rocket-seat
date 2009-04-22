@@ -27,14 +27,20 @@ class CoreEvents(Events):
     '''
     # As a side note, these are ordered by timeline and not by alpha.
 
-    # Ask each plugin if they want to register for this specific page load.
+    #: Ask each plugin if they want to register for this specific page load.
     core__bootstrap_finished = db.StringListProperty()
+    
+    #: If a plugin has CSS to add to the page, do so on this event.
+    #: Expected Return: A tuple of tuples, in the same format used for user
+    #: themes.
+    #: @also: L{core.themes.usability.theme.css_files}
+    core_p__add_plugin_css = db.StringListProperty()
 
-    # These two are called _after_ a plugin is installed/uninstalled.
+    #: These two are called _after_ a plugin is installed/uninstalled.
     core__plugin_installed_hook = db.StringListProperty()
     core__plugin_uninstalled_hook = db.StringListProperty()
     
-    # These two are called _after_ a plugin is enabled/disabled.
+    #: These two are called _after_ a plugin is enabled/disabled.
     core__plugin_enabled_hook = db.StringListProperty()
     core__plugin_disabled_hook = db.StringListProperty()
 
