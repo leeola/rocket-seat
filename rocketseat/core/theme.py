@@ -106,16 +106,25 @@ class Theme(object):
         self.css_files = list(theme_module.css_files)
         #: A list of L{js file <JSFile>} like objects.
         self.js_files = list(theme_module.js_files)
+        
         self._rendered_css_html = None
         self._rendered_js_html = None
+        self._rendered_blocks_html = ''
         
         ## Trigger the event, so other plugins can add to the css.
         #plugin_css = event_controller.call_listeners(
             #'core_p', 'add_plugin_css')
+        
+        self.regions = theme_module.regions
+        
     
     def render(self):
+        '''Render the entire page, through a cascading series of calls to
+        this class and render listeners.
         '''
-        '''
+        
+        
+        
         template = mako.template.Template(
             filename='%s/base.html' % self.theme_rel_path)
         return template.render(

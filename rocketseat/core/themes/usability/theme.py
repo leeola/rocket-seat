@@ -20,19 +20,25 @@ humane_name = 'Usability'
 
 theme_graphic = None
 
+blocks = (
+    Block(name='blog_posts', uri_match='/blog*', template='block.html',
+          inner_regions=(
+              Region('blog_poster_avatar', url_match='/blog*', 
+                     template='region-blog.html'),
+          )
+          )
+)
+
+pages = (
+    Page(template='page.html'),
+    Page(uri_match='/bio', template='page-bio.html'),
+)
+
 regions = (
-    'content',
-    'menu',
-    'navigation',
-    'footer'
-)
-
-page_templates = (
-    'page.html',
-)
-
-region_templates = (
-)
-
-block_templates = (
+    Region(name='content', url_match='/content*',
+           template='region-contact.html'),
+    Region(name='blog', url_match='/blog*', template='region-blog.html'),
+    Region(name='menu', template='region-menu.html'),
+    Region(name='navigation', template='region-menu.html'),
+    Region(name='footer', template='region-menu.html'),
 )

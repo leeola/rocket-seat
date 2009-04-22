@@ -21,7 +21,7 @@ class PageHandler(google.appengine.ext.\
         # Grab the data from the cache
         page_bootstrap = memcache.get('page_bootstrap')
         # This is here to disable caching for early testing of themes.
-        page_bootstrap = None
+        #page_bootstrap = None
         
         try:
             if page_bootstrap is not None:
