@@ -23,7 +23,7 @@ theme_graphic = None
 blocks = (
     Block(name='blog_posts', uri_match='/blog*', template='block.html',
           inner_regions=(
-              Region('blog_poster_avatar', url_match='/blog*', 
+              Region('blog_poster_avatar', uri_match='/blog*', 
                      template='region-blog.html'),
           )
           )
@@ -35,10 +35,10 @@ pages = (
 )
 
 regions = (
-    Region(name='content', url_match='/content*',
+    Region(name='content', uri_match='/content*',
            template='region-contact.html'),
-    Region(name='blog', url_match='/blog*', template='region-blog.html'),
+    Region(name='blog', uri_match='/blog*', template='region-blog.html'),
     Region(name='menu', template='region-menu.html'),
-    Region(name='navigation', template='region-menu.html'),
-    Region(name='footer', template='region-menu.html'),
+    Region(name='navigation', template='region-navigation.html'),
+    Region(name='footer', template='region-footer.html'),
 )
