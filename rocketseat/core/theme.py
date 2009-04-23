@@ -65,7 +65,6 @@ class CSSFile(object):
                                                 self.file_location,
                                                 self.media)
 
-
 class JSFile(object):
     '''
     '''
@@ -115,6 +114,8 @@ class Theme(object):
         #plugin_css = event_controller.call_listeners(
             #'core_p', 'add_plugin_css')
         
+        self.blocks = theme_module.blocks
+        self.pages = theme_module.pages
         self.regions = theme_module.regions
         
     
@@ -123,7 +124,24 @@ class Theme(object):
         this class and render listeners.
         '''
         
+        # Make some fake data here, and pretend this came from plugins for now.
+        fakedata = {
+            'spam_block_one':{
+                'block_title':'Spam Block One',
+                'block_content':'Look, I\'m spam!',
+                'spam_index':0,
+            },
+            'spam_block_two':{
+                'block_title':'Spam Block Two',
+                'block_content':'Look, I\'m spam!',
+                'spam_index':1,
+            },
+        }
         
+        
+        rendered_region_blocks = {
+        
+        }
         
         template = mako.template.Template(
             filename='%s/base.html' % self.theme_rel_path)
@@ -180,5 +198,74 @@ class Theme(object):
         return self._rendered_js_html
     
     rendered_js_html = property(_get_rendered_js_html)
-    
+
+
+class ThemeTemplateElement(object):
+    '''The base class for theme template elements such as L{pages <Page>},
+    L{regions <Region>}, and L{blocks <Block>}.
+    '''
+
+    def __init__(self, template_file, uri_match=None):
+        '''
+        @param uri_match: If the uri does not match the regex supplied here,
+        the block will not be shown.
+        @type uri_match: A regex string or None.
+        
+        @param template_file: The template file this block will render.
+        @type template_file: A string path.
+        '''
+        
+        self.uri_match = uri_match
+        self.template_file = template_file
+
+class Block(ThemeTemplateElement):
+    '''This object allows the user to define a block template, specific uri
+    requirements, and any regions that exist inside of it.
+    '''
+
+    def __init__(self, template_file, name=None, uri_match=None,
+                 inner_regions=None):
+        '''
+        @param name: The name of the block. When plugins submit content, they
+        do so planning that it will be put into a block with a specific name.
+        So as you might guess, naming this correctly is very important.
+        @type name: A string or None.
+        
+        @param inner_regions: If defined, the block will render the region(s)
+        inside of it, along with any blocks the region(s) may contain
+        @type inner_regions: A list or tuple or L{regions <Region>}.
+        
+        @important: If both name and uri_match are None, all blocks that reach
+        this instance will use it because the name matches (U{None is
+        essentially a wildcard}), and the uri matches (U{Again, None is
+        a wildcard}). This is useful if you want all blocks, no matter name or
+        uri, to use a specific template.
+        
+        Usually you put this "wildcard block" at the end of the blocks list, so
+        that you can match any blocks you need, and if none of those match,
+        your wildcard is chosen.
+        '''
+        super(Block, self).__init__(template_file, uri_match)
+        
+        self.name = name
+        if inner_regions is not None:
+            self.inner_regions = list(inner_regions)
+
+class Page(ThemeTemplateElement):
+    '''
+    '''
+
+    def __init__(self, template_file, uri_match=None):
+        '''
+        '''
+        super(Page, self).__init__(template_file, uri_match)
+
+class Region(ThemeTemplateElement):
+    '''
+    '''
+
+    def __init__(self, template_file, name, uri_match=None):
+        '''
+        '''
+        super(Region, self).__init__(template_file, uri_match)
     

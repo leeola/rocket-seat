@@ -3,7 +3,7 @@
 # Standard
 # Related
 # Local
-from core.theme import CSSFile, JSFile
+from core.theme import CSSFile, JSFile, Block, Page, Region
 
 js_files = (
 )
@@ -20,25 +20,27 @@ humane_name = 'Usability'
 
 theme_graphic = None
 
-blocks = (
-    Block(name='blog_posts', uri_match='/blog*', template='block.html',
+blocks = [
+    Block(template_file='block-blog_post.html', name='blog_posts',
+          uri_match='/blog*',
           inner_regions=(
-              Region('blog_poster_avatar', uri_match='/blog*', 
-                     template='region-blog.html'),
+              Region(template_file='region-blog.html',
+                     name='blog_poster_avatar', uri_match='/blog*'),
           )
           )
-)
+]
 
-pages = (
-    Page(template='page.html'),
-    Page(uri_match='/bio', template='page-bio.html'),
-)
+pages = [
+    Page(template_file='page.html'),
+    Page(uri_match='/bio', template_file='page-bio.html'),
+]
 
-regions = (
-    Region(name='content', uri_match='/content*',
-           template='region-contact.html'),
-    Region(name='blog', uri_match='/blog*', template='region-blog.html'),
-    Region(name='menu', template='region-menu.html'),
-    Region(name='navigation', template='region-navigation.html'),
-    Region(name='footer', template='region-footer.html'),
-)
+regions = [
+    Region(template_file='region-contact.html', name='content',
+           uri_match='/content*'),
+    Region(template_file='region-blog.html', name='blog',
+           uri_match='/blog*'),
+    Region(template_file='region-menu.html', name='menu'),
+    Region(template_file='region-navigation.html', name='navigation'),
+    Region(template_file='region-footer.html', name='footer'),
+]
