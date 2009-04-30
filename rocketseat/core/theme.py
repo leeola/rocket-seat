@@ -114,9 +114,61 @@ class Theme(object):
         #plugin_css = event_controller.call_listeners(
             #'core_p', 'add_plugin_css')
         
-        self.blocks = theme_module.blocks
-        self.pages = theme_module.pages
-        self.regions = theme_module.regions
+        # To make sure atleast 1 handler works (and thus, avoiding a key error)
+        # we append the generic, base, block, region, and page handlers to 
+        # theme module lists.
+        theme_module.bases.append(
+            BaseTemplateOverride(template_text=(
+                '<?xml version="1.0" encoding="UTF-8"?>'
+                '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"'
+                '    "DTD/xhtml1-strict.dtd">'
+                '<html xmlns="http://www.w3.org/1999/xhtml"'
+                '    xml:lang="en" lang="en">'
+                '<head>'
+                '    <title>${page_title} - ${site_name}</title>'
+                '    ${site_js}'
+                '    ${site_css}'
+                '</head>'
+                '<body>'
+                '    ${base_body}'
+                '</body>'
+                '</html>'
+                ))
+        )
+        theme_module.blocks.append(
+            BlockTemplateOverride(template_text=(
+                '<div class="${block_css_classes}">'
+                '    <h3>${block_title}</h3>'
+                '    <div>'
+                '        ${block_content}'
+                '    </div>'
+                '</div>'
+                ))
+        )
+        theme_module.pages.append(
+            PageTemplateOverride(template_text=(
+                '<div class="container grid">'
+                '    ${region_menu}'
+                '    <div class="">'
+                '    </div>'
+                '</div>'
+            ))
+        )
+        theme_module.regions.append(
+            RegionTemplateOverride(template_text=(
+                '<div class="${region_css_classes}">'
+                '    ${blocks}'
+                '</div>'
+            ))
+        )
+        
+        blocks = {}
+        for block in theme_module.blocks:
+            blocks[block.name] = block
+        self.block_handlers = blocks
+        
+        self.page_handlers = theme_module.pages
+        self.region_handlers = theme_module.regions
         
     
     def render(self):
@@ -138,10 +190,47 @@ class Theme(object):
             },
         }
         
-        
-        rendered_region_blocks = {
-        
+        # The db knows which block goes in what region. Here we fake it
+        block_locations_by_region = {
+            'blog':(
+                'spam_block_one',
+            ),
+            'footer':(
+                'spam_block_two',
+            ),
         }
+        
+        # Cycle through each block_handler
+        
+        # Store each region's rendered results here so it can then be fed to
+        # the page template.
+        rendered_regions = {}
+        
+        # Store this locally for speed.
+        blocks = self.block_handlers
+        
+        # Loop through each item of the block locations dict, where the
+        # Key is the region name, and the value is a list of blocks
+        # belonging in that region.
+        for region_name, block_names in block_locations_by_region.items():
+            # For each rendered block, we append it to this string.
+            rendered_region = ''
+            
+            # Loop through each block_name.
+            for block_name in block_names:
+                # Grab the block object, from self.blocks (locally assigned)
+                block = blocks[block_name]
+                # Create a template for that block
+                if block.template_text is None:
+                    block_template = mako.template.Template(
+                        filename=block.template_text)
+                else:
+                    block_template = mako.template.Template(
+                        filename=block.template_file)
+                # render the block template by exploding the dict into the
+                # function.
+                rendered_region += block_template.render(
+                    **fakedata[block_name])
         
         template = mako.template.Template(
             filename='%s/base.html' % self.theme_rel_path)
@@ -200,30 +289,81 @@ class Theme(object):
     rendered_js_html = property(_get_rendered_js_html)
 
 
-class ThemeTemplateElement(object):
-    '''The base class for theme template elements such as L{pages <Page>},
-    L{regions <Region>}, and L{blocks <Block>}.
+class CoreTemplateOverride(object):
+    '''The base class for theme core template overrides such as 
+    L{pages <PageTemplateOverride>}, L{regions <RegionTemplateOverride>}, and 
+    L{blocks <BlockTemplateOverride>}.
     '''
 
-    def __init__(self, template_file, uri_match=None):
+    def __init__(self, local_template_file=None, rel_template_file=None,
+                 template_text=None, uri_match=None):
         '''
+        @param local_template_file: The filename of a template file, absolute
+        from the active theme directory.
+        Eg:
+         - block-user_login.html
+         - admin/block-login.html
+         - forum/blocks/new_post.html
+        This is basically only used by the theme developers, for plugin
+        template overrides, see the rel_template_file param.
+        @type local_template_file: A string path.
+        
+        @param rel_template_file: The filename of the template file, relative
+        to rocketseat's core dir.
+        Eg:
+         - ../user/plugins/some_plugin/theme/block.html
+         - plugins/admin/theme/block-admin_login.html
+        This is to be used by plugins mainly, as it allows them to give a path
+        to any template file found in rocketseat.
+        
+        @param template_text: If supplied, the handler will render from this
+        and _not_ the template_file.
+        
         @param uri_match: If the uri does not match the regex supplied here,
         the block will not be shown.
         @type uri_match: A regex string or None.
-        
-        @param template_file: The template file this block will render.
-        @type template_file: A string path.
         '''
         
+        if (local_template_file is None and rel_template_file is None
+            and template_text is None):
+            raise core.error.MissingTemplateInOverride()
+        
+        self.local_template_file = local_template_file
+        self.rel_template_file = rel_template_file
+        self.template_text = template_text
         self.uri_match = uri_match
-        self.template_file = template_file
+    
+    def get_template(self):
+        '''Return the mako template object for this 
+        '''
+        # If template text is defined, use that.
+        if self.template_text is not None:
+            return mako.template.Template(
+                text=self.template_text)
+        
+        # If we make it here, no template text was defined.. and there
+        # _better_ be a template file... or all hell breaks loose.
+        return mako.template.Template(
+                text=self.template_text)
 
-class Block(ThemeTemplateElement):
+class BaseTemplateOverride(CoreTemplateOverride):
+    '''
+    '''
+
+    def __init__(self, local_template_file=None, rel_template_file=None,
+                 template_text=None, uri_match=None):
+        '''
+        '''
+        super(BaseTemplateOverride, self).__init__(
+            local_template_file, rel_template_file, template_text, uri_match)
+
+class BlockTemplateOverride(CoreTemplateOverride):
     '''This object allows the user to define a block template, specific uri
     requirements, and any regions that exist inside of it.
     '''
 
-    def __init__(self, template_file, name=None, uri_match=None,
+    def __init__(self, local_template_file=None, rel_template_file=None,
+                 template_text=None, name=None, uri_match=None,
                  inner_regions=None):
         '''
         @param name: The name of the block. When plugins submit content, they
@@ -245,27 +385,34 @@ class Block(ThemeTemplateElement):
         that you can match any blocks you need, and if none of those match,
         your wildcard is chosen.
         '''
-        super(Block, self).__init__(template_file, uri_match)
+        super(BlockTemplateOverride, self).__init__(
+            local_template_file, rel_template_file, template_text, uri_match)
         
         self.name = name
         if inner_regions is not None:
-            self.inner_regions = list(inner_regions)
+            self.inner_regions = inner_regions
 
-class Page(ThemeTemplateElement):
+class PageTemplateOverride(CoreTemplateOverride):
     '''
     '''
 
-    def __init__(self, template_file, uri_match=None):
+    def __init__(self, local_template_file=None, rel_template_file=None,
+                 template_text=None, uri_match=None):
         '''
         '''
-        super(Page, self).__init__(template_file, uri_match)
+        super(PageTemplateOverride, self).__init__(
+            local_template_file, rel_template_file, uri_match)
 
-class Region(ThemeTemplateElement):
+class RegionTemplateOverride(CoreTemplateOverride):
     '''
     '''
 
-    def __init__(self, template_file, name, uri_match=None):
+    def __init__(self, local_template_file=None, rel_template_file=None,
+                 template_text=None, name=None, uri_match=None):
         '''
         '''
-        super(Region, self).__init__(template_file, uri_match)
+        super(RegionTemplateOverride, self).__init__(
+            local_template_file, rel_template_file, template_text, uri_match)
+        
+        self.name = name
     
