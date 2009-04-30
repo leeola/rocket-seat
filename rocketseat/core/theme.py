@@ -162,6 +162,24 @@ class Theme(object):
             ))
         )
         
+        # For the sake of speed on cached loads, we will sort the overrides
+        # on a few criteria now, so that later consecutive cached page loads
+        # can benefit from this sorting. What we do is group types of overrides
+        # based on what information they have to match the page load, and the
+        # data loading.
+        # 
+        # The following is the possible groups we will sort all the overrides
+        # into:
+        # - Overrides with only names (Direct Matches by Name)
+        # - Overrides with only uri (Requires regex matching on every item,
+        #   costly.)
+        # - Overrides with both uri and name (Check the name, if it matches
+        #   check the uri.
+        # - An override with no name or uri (Only the first instance of this
+        #   will match, seeing as the first occurance will _always_ match, the
+        #   following ones can be ignore.)
+        
+        
         blocks = {}
         for block in theme_module.blocks:
             blocks[block.name] = block
