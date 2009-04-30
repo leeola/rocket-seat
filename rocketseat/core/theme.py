@@ -174,16 +174,43 @@ class Theme(object):
         # - Overrides with only uri (Requires regex matching on every item,
         #   costly.)
         # - Overrides with both uri and name (Check the name, if it matches
-        #   check the uri.
+        #   check the uri.)
+        #   Note: You could actually combine this one, and the "only name"
+        #   override group together, and simply check if there is a uri on
+        #   each name match. I am choosing not to and banking on it being
+        #   more benefitial and hoping the speed of any "only name" matches
+        #   make it worth it.
         # - An override with no name or uri (Only the first instance of this
         #   will match, seeing as the first occurance will _always_ match, the
         #   following ones can be ignore.)
         
+        # The keys are the block names
+        block_overrides_by_name = {}
+        # The keys are the blocks uri matches
+        block_overrides_by_uri = {}
+        # The keys are the names, and then uri's are looked up on eatch
+        block_overrides_by_uri_and_name = {}
+        # The first occurance of a "match all" override. All others are ignored.
+        block_override_matching_all = None
         
-        blocks = {}
         for block in theme_module.blocks:
-            blocks[block.name] = block
-        self.block_handlers = blocks
+            if block.uri_match is not None:
+                if block.name is None:
+                    block_overrides_by_uri[block.uri_match] = block
+                else:
+                    block_overrides_by_uri_and_name[block.name] = block
+            elif block.name is not None:
+                block_overrides_by_name[block.name] = block
+            elif block_override_matching_all is None:
+                # If there is no match all block override, assign it now.
+                block_override_matching_all = block
+            # If the code path makes it here, it is a match all, but match
+            # all has already been assigned, so ignore it.
+        # Now assign the built groups of block overrides into self.
+        self.block_overrides_by_name = block_overrides_by_name
+        self.block_overrides_by_uri = block_overrides_by_uri
+        self.block_overrides_by_uri_and_name = block_overrides_by_uri_and_name
+        self.block_override_matching_all = block_override_matching_all
         
         self.page_handlers = theme_module.pages
         self.region_handlers = theme_module.regions
