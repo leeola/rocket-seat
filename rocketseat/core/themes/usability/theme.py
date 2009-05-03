@@ -60,6 +60,9 @@ regions = [
         #uri_match='/content*'),
     #RegionHandler(
         #local_template_file='region-blog.html', name='blog',
+        #uri_match='/blog_news'),
+    #RegionHandler(
+        #local_template_file='region-blog.html', name='blog',
         #uri_match='/blog*'),
     #RegionHandler(
         #local_template_file='region-menu.html', name='menu'),

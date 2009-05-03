@@ -24,6 +24,8 @@ class RequestBootstrap(object):
         else:
             self.uri_arguments = uri_arguments.split('/')
         
+        self.uri = uri_arguments
+        
         self.request_method = request_method
         if request_method == 'post':
             self.post_data = request_handler.request.params

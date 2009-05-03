@@ -3,6 +3,7 @@
 
 # Standard
 import os.path
+import re
 # Related
 import mako.template
 # Local
@@ -173,13 +174,6 @@ class Theme(object):
         # - Overrides with only names (Direct Matches by Name)
         # - Overrides with only uri (Requires regex matching on every item,
         #   costly.)
-        # - Overrides with both uri and name (Check the name, if it matches
-        #   check the uri.)
-        #   Note: You could actually combine this one, and the "only name"
-        #   override group together, and simply check if there is a uri on
-        #   each name match. I am choosing not to and banking on it being
-        #   more benefitial and hoping the speed of any "only name" matches
-        #   make it worth it.
         # - An override with no name or uri (Only the first instance of this
         #   will match, seeing as the first occurance will _always_ match, the
         #   following ones can be ignore.)
@@ -201,20 +195,17 @@ class Theme(object):
         block_overrides_by_name = {}
         # The keys are the block override's uri regex string
         block_overrides_by_uri = {}
-        # The keys are the names, and then uri's are looked up on each name
-        # match
-        block_overrides_by_uri_and_name = {}
         # The first occurance of a "match all" override. All others are ignored.
         block_override_matching_all = None
 
-        for block in theme_module.blocks:
-            if block.uri_match is not None:
-                if block.name is None:
-                    block_overrides_by_uri[block.uri_match] = block
-                else:
-                    block_overrides_by_uri_and_name[block.name] = block
-            elif block.name is not None:
-                block_overrides_by_name[block.name] = block
+        for block_override in theme_module.blocks:
+            if block_override.name is not None:
+                block_overrides_by_name[block_override.name] = block_override
+
+            elif block_override.uri_match is not None:
+                block_overrides_by_uri[
+                    block_override.uri_match] = block_override
+
             elif block_override_matching_all is None:
                 # If there is no match all block override, assign it now.
                 block_override_matching_all = block
@@ -223,7 +214,6 @@ class Theme(object):
         # Now assign the built groups of block overrides into self.
         self.block_overrides_by_name = block_overrides_by_name
         self.block_overrides_by_uri = block_overrides_by_uri
-        self.block_overrides_by_uri_and_name = block_overrides_by_uri_and_name
         self.block_override_matching_all = block_override_matching_all
 
         # The keys are the uri regex string.
@@ -233,6 +223,7 @@ class Theme(object):
         for page in theme_module.pages:
             if page.uri_match is not None:
                 page_overrides_by_uri[page.uri_match] = page
+
             elif page_override_matching_all is None:
                 page_override_matching_all = page
 
@@ -243,26 +234,21 @@ class Theme(object):
         region_overrides_by_name = {}
         # The keys are the region override's uri regex string
         region_overrides_by_uri = {}
-        # The keys are the names, and then uri's are looked up on each name
-        # match
-        region_overrides_by_uri_and_name = {}
         # The first occurance of a "match all" override. All others are ignored.
         region_override_matching_all = None
 
-        for region in theme_module.regions:
-            if region.uri_match is not None:
-                if region.name is None:
-                    region_overrides_by_uri[block.uri_match] = block
-                else:
-                    block_overrides_by_uri_and_name[block.name] = block
-            elif block.name is not None:
-                block_overrides_by_name[block.name] = block
-            elif block_override_matching_all is None:
-                region_override_matching_all = block
+        for region_override in theme_module.regions:
+            if region_override.name is not None:
+                region_overrides_by_name[region.name] = region_override
+
+            elif region.uri_match is not None:
+                region_overrides_by_uri[block.uri_match] = region_override
+
+            elif region_override_matching_all is None:
+                region_override_matching_all = region_override
 
         self.region_overrides_by_name = region_overrides_by_name
         self.region_overrides_by_uri = region_overrides_by_uri
-        self.region_overrides_by_uri_and_name = region_overrides_by_uri_and_name
         self.region_override_matching_all = region_override_matching_all
 
 
@@ -286,46 +272,82 @@ class Theme(object):
         }
 
         # The db knows which block goes in what region. Here we fake it
-        block_locations_by_region = {
-            'blog':(
-                'spam_block_one',
-                ),
-            'footer':(
-                'spam_block_two',
-                ),
+        block_region_assignments = {
+            'spam_block_one':'content',
+            'spam_block_two':'footer',
         }
-
-        # Cycle through each block_handler
 
         # Store each region's rendered results here so it can then be fed to
         # the page template.
-        rendered_regions = {}
+        rendered_region_contents = {}
 
-        # Store this locally for speed.
-        blocks = self.block_handlers
+        # Store these locally for speed.
+        block_overrides_by_name = self.block_overrides_by_name
+        block_overrides_by_uri = self.block_overrides_by_uri
 
-        # Loop through each item of the block locations dict, where the
-        # Key is the region name, and the value is a list of blocks
-        # belonging in that region.
-        for region_name, block_names in block_locations_by_region.items():
-            # For each rendered block, we append it to this string.
-            rendered_region = ''
+        for block_name, region_name in block_region_assignments.items():
+            # Loop through each block and its assigned region.
 
-            # Loop through each block_name.
-            for block_name in block_names:
-                # Grab the block object, from self.blocks (locally assigned)
-                block = blocks[block_name]
-                # Create a template for that block
-                if block.template_text is None:
-                    block_template = mako.template.Template(
-                        filename=block.template_text)
+            if not rendered_region_contents.has_key(region_name):
+                # If the rendered_region_contents doesn't have the region_name
+                # key, we add a default value to it here. This way, later when
+                # it is added to, we don't have to check it there. Which will
+                # be checked more often than here.
+                
+                rendered_region_contents[region_name] = ''
+            
+            if block_overrides_by_name.has_key(block_name):
+                # Check if this region has a name-only match
+
+                for block_matched_by_name in block_overrides_by_name[
+                    block_name]:
+                    # Loop through all the overrides matching that name
+
+                    if block_matched_by_name.uri_match is None:
+                        # if the block has no uri_match, use it.
+
+                        block_override = block_matched_by_name
+                        break
+                    elif (re.compile(block_matched_by_name.uri_match).
+                          match(ahhhh_im_not_real) is not None):
+                        # If there is a url_match, and it matches the current
+                        # url, use it.
+
+                        block_override = block_matched_by_name
+                        break
+            else:
+                # If we get here, there is no name matching the override, but
+                # there is a uri 
+
+                for block_override_by_uri in block_overrides_by_uri:
+                    # As slow as it is, here we have to loop through all of the
+                    # uri_match strings to find the first one that matches.
+
+                    # Create a regex pattern from the uri_match string.
+                    # if there isn't one.. somehow... things are bad.
+                    regex_pattern = re.compile(block_override_by_uri.uri_match)
+
+                    if regex_pattern.match(ahhhh_im_not_real) is not None:
+                        block_override = block_override_by_uri
+                        break
                 else:
-                    block_template = mako.template.Template(
-                        filename=block.template_file)
-                # render the block template by exploding the dict into the
-                # function.
-                rendered_region += block_template.render(
-                    **fakedata[block_name])
+                    # If we loop through all the uri overrides and no match
+                    # has been found (if one is found, the loop is broken), we
+                    # then assign the block_override to the match-alloverride.
+                    block_override = self.block_override_matching_all
+
+            # Create the block mako template
+            if block_override.template_file is not None:
+                block_template = mako.template.Template(
+                    filename=block_override.template_file)
+            else:
+                block_template = mako.template.Template(
+                    text=block_override.template_file)
+
+            # render the block template by exploding the dict into the
+            # function.
+            rendered_region_contents[region_name] += block_template.render(
+                **fakedata[block_name])
 
         template = mako.template.Template(
             filename='%s/base.html' % self.theme_rel_path)
